@@ -69,7 +69,7 @@ async function getViruClass() {
     return classList;
 }
 
-const dirpath = path.resolve(__dirname, '..', 'data');
+const dirpath = path.resolve(__dirname, 'data');
 
 // Call this sychronously because this folder is needed beforehand
 if (!fs.existsSync(dirpath)) {

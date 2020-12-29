@@ -4,7 +4,8 @@
   "description": "Web scraping practice",
   "main": "main.js",
   "scripts": {
-    "build": "node ./src/scraper.js"
+    "build": "webpack",
+    "scrape": "node ./src/scraper.js"
   },
   "keywords": [
     "webscrape"
@@ -14,6 +15,10 @@
   "dependencies": {
     "axios": "^0.21.0",
     "cheerio": "^1.0.0-rc.3",
-    "d3": "^6.3.1"
+    "d3": "^6.3.1",
+    "webpack": "^5.11.1"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.3.0"
   }
 }
