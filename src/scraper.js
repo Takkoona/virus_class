@@ -4,9 +4,7 @@ const url = require('url');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const dirpath = path.resolve(__dirname, '..', 'data');
-
-async function getViruNum() {
+async function getVirusNum() {
     const viprURL = 'https://www.viprbrc.org/brc/vipr_allSpecies_search.spg?method=SubmitForm&decorator=vipr';
 
     console.log("Making request to ViPR...");
@@ -14,23 +12,27 @@ async function getViruNum() {
 
     console.log("Parsing html...");
     const $ = cheerio.load(html.data);
-    let numList = {};
+    let numList = [];
     let numMapping = {};
     $('tr.multicheckRow.odd').each((_index, element) => {
         let groupid = $(element).attr('groupid');
         // console.log(groupid);
         let columns = $(element).children();
-        let colNum = columns.length;
-        if (colNum === 4) {
+        if (columns.length === 4) {
             numMapping[groupid] = $(columns).eq(0).text();
             numList[numMapping[groupid]] = [];
         }
-        numList[numMapping[groupid]].push($(columns).last().text());
+        let virusName = $(columns).last().children('a').text();
+        let numInfo = $(columns).last().children().remove().end().text();
+        numInfo = numInfo.replace(/[()]/g, '').split(' - ');
+        numList.push({
+            virusName: virusName,
+            virusFamily: numMapping[groupid],
+            strainNum: parseInt(numInfo[0]),
+            genomeNum: parseInt(numInfo[1])
+        })
     });
-    return {
-        outfile: 'virusNum.json',
-        data: numList
-    };
+    return numList;
 }
 
 async function getViruClass() {
@@ -57,20 +59,17 @@ async function getViruClass() {
         let title = classpage('title').text();
         title = title.split(' ~ ')[0];
         console.log(title);
-        familyList = [];
         classpage('strong').each((index, element) => {
             n = classpage(element).text();
             if (n.endsWith('dae')) {
-                familyList.push(n);
+                classList[n] = title;
             }
         });
-        classList[title] = familyList;
     })
-    return {
-        outfile: 'virusClass.json',
-        data: classList
-    }
+    return classList;
 }
+
+const dirpath = path.resolve(__dirname, '..', 'data');
 
 // Call this sychronously because this folder is needed beforehand
 if (!fs.existsSync(dirpath)) {
@@ -78,23 +77,25 @@ if (!fs.existsSync(dirpath)) {
 }
 
 Promise.all([
-    getViruNum(),
+    getVirusNum(),
     getViruClass()
 ]).then(values => {
-    values.map(res => {
-        outfile = res.outfile;
-        fs.writeFile(
-            path.resolve(dirpath, outfile),
-            JSON.stringify(res.data, null, 2),
-            (err) => {
-                if (err) {
-                    throw err;
-                } else {
-                    console.log('File saved');
-                }
+    virusNum = values[0].map(element => {
+        element.virusClass = values[1][element.virusFamily];
+        return element;
+    });
+    fs.writeFile(
+        path.resolve(dirpath, 'virusInfo.json'),
+        JSON.stringify(virusNum, null, 2),
+        (err) => {
+            if (err) {
+                throw err;
+            } else {
+                console.log('File saved');
             }
-        );
-    })
+        }
+    );
+    console.log(virusNum.length);
 }).catch(err => {
     console.error(err);
 })
