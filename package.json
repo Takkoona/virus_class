@@ -4,8 +4,9 @@
   "description": "Web scraping practice",
   "main": "main.js",
   "scripts": {
-    "build": "webpack",
-    "scrape": "node ./src/scraper.js"
+    "scrape": "node ./src/scraper.js",
+    "dev": "webpack --watch --mode development --progress",
+    "build": "webpack --mode production"
   },
   "keywords": [
     "webscrape"
@@ -13,7 +14,7 @@
   "author": "Chengyang Ji",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.3",
     "d3": "^6.3.1",
     "webpack": "^5.11.1"
