@@ -80,10 +80,14 @@ Promise.all([
     getVirusNum(),
     getViruClass()
 ]).then(values => {
-    virusNum = values[0].map(element => {
-        element.virusClass = values[1][element.virusFamily];
-        return element;
-    });
+    virusNum = values[0]
+        .map(element => {
+            element.virusClass = values[1][element.virusFamily];
+            return element;
+        })
+        .sort((a, b) => {
+            return b.genomeNum - a.genomeNum;
+        });
     fs.writeFile(
         path.resolve(dirpath, 'virusInfo.json'),
         JSON.stringify(virusNum, null, 2),
