@@ -17,7 +17,8 @@
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.9",
     "d3": "^6.3.1",
-    "webpack": "^5.11.1"
+    "webpack": "^5.11.1",
+    "nth-check": ">=2.0.1"
   },
   "devDependencies": {
     "webpack-cli": "^4.3.0"
